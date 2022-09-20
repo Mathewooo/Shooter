@@ -5,7 +5,7 @@
 extern App app;
 
 void prepareScene(void) {
-    SDL_SetRenderDrawColor(app.renderer, 32, 32, 32, 255);
+    SDL_SetRenderDrawColor(app.renderer, 32, 32, 52, 245);
     SDL_RenderClear(app.renderer);
 }
 
@@ -22,6 +22,5 @@ void blit(SDL_Texture *texture, int x, int y) {
     SDL_Rect dest;
     dest.x = x, dest.y = y;
     SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
-    //Double image size - dest.w *= 2; dest.h *= 2;
     SDL_RenderCopy(app.renderer, texture, NULL, &dest);
 }

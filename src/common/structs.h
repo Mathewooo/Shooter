@@ -20,7 +20,7 @@ struct Entity {
     float dx;
     float dy;
     int health;
-    int reload;
+    int bulletReload;
     SDL_Texture *texture;
     Entity *next;
 };
