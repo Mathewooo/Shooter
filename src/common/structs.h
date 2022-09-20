@@ -1,23 +1,31 @@
+typedef struct Entity Entity;
+
+typedef struct {
+    void (*logic)(void);
+    void (*draw)(void);
+} Delegate;
+
 typedef struct {
     SDL_Renderer *renderer;
     SDL_Window *window;
-    int up;
-    int down;
-    int left;
-    int right;
-    int fire;
+    Delegate delegate;
+    int keyboard[MAX_KEYBOARD_KEYS];
 } App;
 
-typedef struct {
-    int x;
-    int y;
-    int dx;
-    int dy;
+struct Entity {
+    float x;
+    float y;
+    int w;
+    int h;
+    float dx;
+    float dy;
     int health;
+    int reload;
     SDL_Texture *texture;
-} Entity;
+    Entity *next;
+};
 
 typedef struct {
-    SDL_Scancode scanCode;
-    int *direction;
-} Keys;
+    Entity fighterHead, *fighterTail;
+    Entity bulletHead, *bulletTail;
+} Core;
