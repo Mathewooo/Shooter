@@ -45,18 +45,26 @@ static void initPlayer(void) {
     SDL_QueryTexture(player->texture, NULL, NULL, &player->w, &player->h);
 }
 
-static void doPlayer(void) {
-    player->dx = player->dy = 0;
+void clipPlayer(void) {
+    if (player->x + player->w >= SCREEN_WIDTH) player->dx -= PLAYER_SPEED;
+    if (player->y + player->h >= SCREEN_HEIGHT) player->dy -= PLAYER_SPEED;
+    if (player->x <= 0) player->dx += PLAYER_SPEED;
+    if (player->y <= 0) player->dy += PLAYER_SPEED;
+}
 
-    if (player->bulletReload > 0)
-        player->bulletReload--;
-
+void playerInput(void) {
     if (app.keyboard[SDL_SCANCODE_UP]) player->dy = -PLAYER_SPEED;
-    if (app.keyboard[SDL_SCANCODE_DOWN]) player->dy = PLAYER_SPEED;
     if (app.keyboard[SDL_SCANCODE_LEFT]) player->dx = -PLAYER_SPEED;
+    if (app.keyboard[SDL_SCANCODE_DOWN]) player->dy = PLAYER_SPEED;
     if (app.keyboard[SDL_SCANCODE_RIGHT]) player->dx = PLAYER_SPEED;
     if (app.keyboard[SDL_SCANCODE_SPACE] && player->bulletReload == 0) fireBullet();
+    clipPlayer();
+}
 
+static void doPlayer(void) {
+    player->dx = player->dy = 0;
+    if (player->bulletReload > 0) player->bulletReload--;
+    playerInput();
     player->x += player->dx;
     player->y += player->dy;
 }
@@ -85,20 +93,25 @@ static void fireBullet(void) {
     player->bulletReload = BULLET_RELOAD;
 }
 
-static void doBullets(void) {
+static void doBullets(void) { //TRY TO UNDERSTAND THIS MORE!!!!: (SEE LINKED LISTS)
     Entity *bullet, *prev;
     prev = &core.bulletHead;
     for (bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next) {
         bullet->x += bullet->dx;
         bullet->y += bullet->dy;
         if (bullet->x >= SCREEN_WIDTH) {
-            if (bullet == core.bulletTail)
+            printf("Screen ended!\n"); //
+            if (bullet == core.bulletTail) {
+                printf("Bullet equals core.bulletTail!\n"); //
                 core.bulletTail = prev;
+            }
             prev->next = bullet->next;
+            printf("Bullet reload at end of the screen: %d\n", bullet->bulletReload); //
             free(bullet);
             bullet = prev;
         }
         prev = bullet;
+        printf("Prev Bullet reload: %d\n", prev->bulletReload); //
     }
 }
 
@@ -117,7 +130,8 @@ static void drawPlayer(void) {
 }
 
 static void drawBullets(void) {
-    for (Entity *bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next)
+    for (Entity *bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next) {
+        printf("x: %f\n", bullet->x); //
         blit(bullet->texture, bullet->x, bullet->y);
-
+    }
 }
