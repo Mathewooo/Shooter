@@ -1,5 +1,4 @@
 #include "common/common.h"
-#include "draw.h"
 #include "core.h"
 
 static void logic(void);
@@ -19,6 +18,7 @@ extern Core core;
 
 static Entity *player;
 static SDL_Texture *bulletTexture;
+
 
 void initStage(void) {
     app.delegate.logic = logic;
@@ -67,7 +67,9 @@ static void movePlayer(void) {
 
 void updateBulletLoc(Entity *const bullet) {
     bullet->x = player->x + 40;
-    bullet->y = player->y;
+    bullet->y = randomBound(
+            player->y - BOUND, player->y + BOUND
+            );
     bullet->dx = PLAYER_BULLET_SPEED;
     bullet->health = 1;
     bullet->texture = bulletTexture;
@@ -89,21 +91,11 @@ static void fireBullet(void) {
     player->bulletReload = BULLET_RELOAD;
 }
 
-long randomBound(long min, long max) {
-    unsigned long num_bins = (max - min) + 1L, num_rand = RAND_MAX + 1L, bin_size = num_rand / num_bins,
-    defect = num_rand % num_bins;
-    long x;
-    do x = random();
-    while (num_rand - defect <= (unsigned long) x);
-    return min + (x / bin_size);
-}
-
 static void moveBullets(void) {
     Entity *bullet, *prev;
     prev = &core.bulletHead;
     for (bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next) {
         bullet->x += bullet->dx;
-        bullet->y += randomBound(-PLAYER_SPEED, PLAYER_SPEED);
         if (bullet->x >= SCREEN_WIDTH) {
             if (bullet == core.bulletTail)
                 core.bulletTail = prev;

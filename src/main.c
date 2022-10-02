@@ -19,7 +19,6 @@ int main(void) {
     initStage();
     then = SDL_GetTicks();
     remainder = 0;
-
     while (true) {
         prepareScene();
         doInput();

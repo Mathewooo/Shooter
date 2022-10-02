@@ -1,0 +1,1 @@
+long randomBound(long min, long max);
