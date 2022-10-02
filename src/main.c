@@ -20,7 +20,7 @@ int main(void) {
     then = SDL_GetTicks();
     remainder = 0;
 
-    while (1) {
+    while (true) {
         prepareScene();
         doInput();
         app.delegate.logic();

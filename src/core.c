@@ -10,10 +10,6 @@ static void initPlayer(void);
 
 static void fireBullet(void);
 
-static void doPlayer(void);
-
-static void doBullets(void);
-
 static void drawPlayer(void);
 
 static void drawBullets(void);
@@ -61,7 +57,7 @@ void playerInput(void) {
     clipPlayer();
 }
 
-static void doPlayer(void) {
+static void movePlayer(void) {
     player->dx = player->dy = 0;
     if (player->bulletReload > 0) player->bulletReload--;
     playerInput();
@@ -93,31 +89,35 @@ static void fireBullet(void) {
     player->bulletReload = BULLET_RELOAD;
 }
 
-static void doBullets(void) { //TRY TO UNDERSTAND THIS MORE!!!!: (SEE LINKED LISTS)
+long randomBound(long min, long max) {
+    unsigned long num_bins = (max - min) + 1L, num_rand = RAND_MAX + 1L, bin_size = num_rand / num_bins,
+    defect = num_rand % num_bins;
+    long x;
+    do x = random();
+    while (num_rand - defect <= (unsigned long) x);
+    return min + (x / bin_size);
+}
+
+static void moveBullets(void) {
     Entity *bullet, *prev;
     prev = &core.bulletHead;
     for (bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next) {
         bullet->x += bullet->dx;
-        bullet->y += bullet->dy;
+        bullet->y += randomBound(-PLAYER_SPEED, PLAYER_SPEED);
         if (bullet->x >= SCREEN_WIDTH) {
-            printf("Screen ended!\n"); //
-            if (bullet == core.bulletTail) {
-                printf("Bullet equals core.bulletTail!\n"); //
+            if (bullet == core.bulletTail)
                 core.bulletTail = prev;
-            }
             prev->next = bullet->next;
-            printf("Bullet reload at end of the screen: %d\n", bullet->bulletReload); //
             free(bullet);
             bullet = prev;
         }
         prev = bullet;
-        printf("Prev Bullet reload: %d\n", prev->bulletReload); //
     }
 }
 
 static void logic(void) {
-    doPlayer();
-    doBullets();
+    movePlayer();
+    moveBullets();
 }
 
 static void draw(void) {
@@ -130,8 +130,6 @@ static void drawPlayer(void) {
 }
 
 static void drawBullets(void) {
-    for (Entity *bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next) {
-        printf("x: %f\n", bullet->x); //
+    for (Entity *bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next)
         blit(bullet->texture, bullet->x, bullet->y);
-    }
 }

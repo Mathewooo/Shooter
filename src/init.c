@@ -20,7 +20,6 @@ void initSDL(void) {
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     app.renderer = SDL_CreateRenderer(app.window, -1, rendererFlags);
-
     IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
 }
 
