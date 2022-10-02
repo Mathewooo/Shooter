@@ -21,6 +21,7 @@ struct Entity {
     float dy;
     int health;
     int bulletReload;
+    int side;
     SDL_Texture *texture;
     Entity *next;
 };

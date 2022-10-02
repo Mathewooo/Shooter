@@ -2,7 +2,6 @@
 #include "draw.h"
 #include "init.h"
 #include "input.h"
-#include "main.h"
 #include "core.h"
 
 App app;
@@ -17,6 +16,7 @@ int main(void) {
     initSDL();
     atexit(cleanup);
     initStage();
+    initRandomness();
     then = SDL_GetTicks();
     remainder = 0;
     while (true) {

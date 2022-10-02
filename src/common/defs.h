@@ -4,4 +4,6 @@
 #define PLAYER_BULLET_SPEED 20
 #define MAX_KEYBOARD_KEYS 350
 #define BULLET_RELOAD 8
-#define BOUND pow(PLAYER_SPEED, 1.4)
+#define SIDE_PLAYER 0
+#define SIDE_ALIEN 1
+#define BOUND pow(PLAYER_SPEED, 1.6)
