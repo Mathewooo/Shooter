@@ -1,8 +1,8 @@
 #include "common/common.h"
 #include "util.h"
 
-#define MIN(a, b) ((a < b) ? a : b)
-#define MAX(a, b) ((a > b) ? a : b)
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 void initRandomness(void) {
     srand(time(NULL));

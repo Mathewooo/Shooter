@@ -19,8 +19,6 @@ void doInput(void) {
             case SDL_KEYUP:
                 doKeyUp(&event.key);
                 break;
-            default:
-                break;
         }
 }
 

@@ -98,12 +98,12 @@ static void fireBullet(void) {
     player->bulletReload = BULLET_RELOAD;
 }
 
-static bool bulletHitFighter(Entity *bullet) {
-    for (Entity *entity = core.fighterHead.next; entity != NULL; entity = entity->next)
-        if (entity->side != bullet->side && didCollide(
-                bullet, entity
+static bool entityCollision(Entity *target) {
+    for (Entity *fighter = core.fighterHead.next; fighter != NULL; fighter = fighter->next)
+        if (fighter->side != target->side && didCollide(
+                target, fighter
                 )) {
-            bullet->health = 0; entity->health = 0;
+            target->health = 0; fighter->health = 0;
             return true;
         }
     return false;
@@ -113,7 +113,7 @@ static void moveBullets(void) {
     Entity *bullet, *prev = &core.bulletHead;
     for (bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next) {
         bullet->x += bullet->dx;
-        if (bulletHitFighter(bullet) || bullet->x >= SCREEN_WIDTH) {
+        if (entityCollision(bullet) || bullet->x >= SCREEN_WIDTH) {
             if (bullet == core.bulletTail)
                 core.bulletTail = prev;
             prev->next = bullet->next;
@@ -129,8 +129,9 @@ static void moveFighters(void) {
     for (fighter = core.fighterHead.next; fighter != NULL; fighter = fighter->next) {
         fighter->x += fighter->dx;
         fighter->y += fighter->dy;
-        if (fighter != player && (fighter->x < -fighter->w
-            || fighter->health == 0)) {
+        if (fighter != player && ((fighter->x <= 0 - fighter->w
+            || fighter->health == 0)
+            || entityCollision(player))) {
             if (fighter == core.fighterTail)
                 core.fighterTail = prev;
             prev->next = fighter->next;
