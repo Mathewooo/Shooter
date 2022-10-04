@@ -9,13 +9,15 @@ Core core;
 
 static void capFrameRate(long *then, float *remainder);
 
+//TODO Later on create a readme file describing all of util's functions and game's logic
+
 int main(void) {
     long then;
     float remainder;
     memset(&app, 0, sizeof(App));
     initSDL();
     atexit(cleanup);
-    initStage();
+    initCore();
     initRandomness();
     then = SDL_GetTicks();
     remainder = 0;

@@ -1,2 +1,2 @@
-void initStage(void);
+void initCore(void);
 

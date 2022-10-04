@@ -5,32 +5,33 @@ static void logic(void);
 
 static void draw(void);
 
-static void initPlayer(void);
-
 static void fireBullet(void);
 
-static void drawFighters(void);
-
-static void drawBullets(void);
+static void resetCore(void);
 
 extern App app;
 extern Core core;
 
 static Entity *player;
+static SDL_Texture *playerTexture;
 static SDL_Texture *bulletTexture;
 static SDL_Texture *enemyTexture;
+static SDL_Texture *enemyBulletTexture;
 static int enemySpawnTimer;
+static int coreResetTimer;
 
-void initStage(void) {
-    app.delegate.logic = logic;
-    app.delegate.draw = draw;
-    memset(&core, 0, sizeof(Core));
-    core.fighterTail = &core.fighterHead;
-    core.bulletTail = &core.bulletHead;
-    initPlayer();
+void cacheTextures(void) {
+    playerTexture = loadTexture("src/assets/player.png");
     bulletTexture = loadTexture("src/assets/bullet.png");
     enemyTexture = loadTexture("src/assets/enemy.png");
-    enemySpawnTimer = 0;
+    enemyBulletTexture = loadTexture("src/assets/enemyBullet.png");
+}
+
+void initCore(void) {
+    app.delegate.logic = logic;
+    app.delegate.draw = draw;
+    cacheTextures();
+    resetCore();
 }
 
 static void initPlayer(void) {
@@ -38,18 +39,42 @@ static void initPlayer(void) {
     memset(player, 0, sizeof(Entity));
     core.fighterTail->next = player;
     core.fighterTail = player;
+    player->health = 1;
     player->x = 100;
     player->y = SCREEN_HEIGHT / 2.0;
-    player->texture = loadTexture("src/assets/player.png");
+    player->texture = playerTexture;
     SDL_QueryTexture(
             player->texture, NULL, NULL, &player->w, &player->h
-            );
+    );
     player->side = SIDE_PLAYER;
 }
 
+static void resetCore(void) {
+    Entity *entity;
+
+    while (core.fighterHead.next) {
+        entity = core.fighterHead.next;
+        core.fighterHead.next = entity->next;
+        free(entity);
+    }
+
+    while (core.bulletHead.next) {
+        entity = core.bulletHead.next;
+        core.bulletHead.next = entity->next;
+        free(entity);
+    }
+
+    memset(&core, 0, sizeof(Core));
+    core.fighterTail = &core.fighterHead;
+    core.bulletTail = &core.bulletHead;
+    initPlayer();
+    enemySpawnTimer = 0;
+    coreResetTimer = FPS * 2;
+}
+
 static void clipPlayer(void) {
-    if (player->x + player->w >= SCREEN_WIDTH)
-        player->dx -= PLAYER_SPEED;
+    if (player->x >= SCREEN_WIDTH / 2)
+        player->dx -= 3.5;
     if (player->y + player->h >= SCREEN_HEIGHT)
         player->dy -= PLAYER_SPEED;
     if (player->x <= 0) player->dx += PLAYER_SPEED;
@@ -66,9 +91,11 @@ static void playerInput(void) {
 }
 
 static void movePlayer(void) {
-    player->dx = player->dy = 0;
-    if (player->bulletReload > 0) player->bulletReload--;
-    playerInput();
+    if (player != NULL) {
+        player->dx = player->dy = 0;
+        if (player->bulletReload > 0) player->bulletReload--;
+        playerInput();
+    }
 }
 
 static void initBullet(Entity *const bullet) {
@@ -113,7 +140,12 @@ static void moveBullets(void) {
     Entity *bullet, *prev = &core.bulletHead;
     for (bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next) {
         bullet->x += bullet->dx;
-        if (entityCollision(bullet) || bullet->x >= SCREEN_WIDTH) {
+        bullet->y += bullet->dy;
+        if (entityCollision(bullet)
+        || bullet->x <= -bullet->w
+        || bullet->y <= -bullet->h
+        || bullet->y >= SCREEN_HEIGHT
+        || bullet->x >= SCREEN_WIDTH) {
             if (bullet == core.bulletTail)
                 core.bulletTail = prev;
             prev->next = bullet->next;
@@ -129,17 +161,17 @@ static void moveFighters(void) {
     for (fighter = core.fighterHead.next; fighter != NULL; fighter = fighter->next) {
         fighter->x += fighter->dx;
         fighter->y += fighter->dy;
-        if (fighter != player && ((fighter->x <= 0 - fighter->w
-            || fighter->health == 0)
-            || entityCollision(player))) {
-            if (fighter == core.fighterTail)
-                core.fighterTail = prev;
+        if (fighter != player && fighter->x <= -fighter->w)
+            fighter->health = 0;
+        if (fighter->health == 0) {
+            if (fighter == player) player = NULL;
+            if (fighter == core.fighterTail) core.fighterTail = prev;
             prev->next = fighter->next;
             free(fighter);
             fighter = prev;
         }
-        prev = fighter;
     }
+    prev = fighter;
 }
 
 static void initEnemy(Entity *const enemy) {
@@ -161,20 +193,48 @@ static void spawnEnemies(void) {
                 enemy->texture, NULL, NULL, &enemy->w, &enemy->h
                 );
         enemy->dx = randomBound(-5, 2);
+        enemy->bulletReload = FPS * randomBound(1, 3);
         enemySpawnTimer = 35 + randVal(70);
     }
 }
 
+static void fireEnemyBullet(Entity *entity) {
+    Entity *bullet = malloc(sizeof(Entity));
+    memset(bullet, 0, sizeof(Entity));
+    core.bulletTail->next = bullet;
+    core.bulletTail = bullet;
+    bullet->x = entity->x;
+    bullet->y = entity->y;
+    bullet->health = 1;
+    bullet->texture = enemyBulletTexture;
+    bullet->side = entity->side;
+    SDL_QueryTexture(bullet->texture, NULL, NULL, &bullet->w, &bullet->h);
+    bullet->x += (entity->w / 2) - (bullet->w / 2);
+    bullet->y += (entity->h / 2) - (bullet->h / 2);
+    calcSlope(
+            player->x + (player->w / 2), player->y + (player->h / 2),
+            entity->x, entity->y,
+            &bullet->dx, &bullet->dy
+            );
+    bullet->dx *= ALIEN_BULLET_SPEED;
+    bullet->dy *= ALIEN_BULLET_SPEED;
+    bullet->side = SIDE_ALIEN;
+    entity->bulletReload = (rand() % FPS * 2);
+}
+
+static void attackingEnemies(void) {
+    for (Entity *entity = core.fighterHead.next ; entity != NULL ; entity = entity->next)
+        if (entity != player && player != NULL && --entity->bulletReload <= 0)
+            fireEnemyBullet(entity);
+}
+
 static void logic(void) {
     movePlayer();
+    attackingEnemies();
     moveFighters();
     moveBullets();
     spawnEnemies();
-}
-
-static void draw(void) {
-    drawFighters();
-    drawBullets();
+    if (player == NULL && --coreResetTimer <= 0) resetCore();
 }
 
 static void drawFighters(void) {
@@ -186,3 +246,9 @@ static void drawBullets(void) {
     for (Entity *bullet = core.bulletHead.next; bullet != NULL; bullet = bullet->next)
         blit(bullet->texture, bullet->x, bullet->y);
 }
+
+static void draw(void) {
+    drawFighters();
+    drawBullets();
+}
+
