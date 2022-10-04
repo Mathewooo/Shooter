@@ -21,10 +21,18 @@ static int enemySpawnTimer;
 static int coreResetTimer;
 
 void cacheTextures(void) {
-    playerTexture = loadTexture("src/assets/player.png");
-    bulletTexture = loadTexture("src/assets/bullet.png");
-    enemyTexture = loadTexture("src/assets/enemy.png");
-    enemyBulletTexture = loadTexture("src/assets/enemyBullet.png");
+    playerTexture = loadTexture(
+            "src/assets/player.png"
+            );
+    bulletTexture = loadTexture(
+            "src/assets/bullet.png"
+            );
+    enemyTexture = loadTexture(
+            "src/assets/enemy.png"
+            );
+    enemyBulletTexture = loadTexture(
+            "src/assets/enemyBullet.png"
+            );
 }
 
 void initCore(void) {
@@ -86,7 +94,8 @@ static void playerInput(void) {
     if (app.keyboard[SDL_SCANCODE_LEFT]) player->dx = -PLAYER_SPEED;
     if (app.keyboard[SDL_SCANCODE_DOWN]) player->dy = PLAYER_SPEED;
     if (app.keyboard[SDL_SCANCODE_RIGHT]) player->dx = PLAYER_SPEED;
-    if (app.keyboard[SDL_SCANCODE_SPACE] && player->bulletReload == 0) fireBullet();
+    if (app.keyboard[SDL_SCANCODE_SPACE] && player->bulletReload == 0)
+        fireBullet();
     clipPlayer();
 }
 
@@ -109,19 +118,12 @@ static void initBullet(Entity *const bullet) {
     bullet->side = SIDE_PLAYER;
 }
 
-static void centerBulletTexture(Entity *const bullet) {
-    SDL_QueryTexture(
-            bullet->texture, NULL, NULL, &bullet->w, &bullet->h
-            );
-    bullet->y += (player->h / 2) - (bullet->h / 2);
-}
-
 static void fireBullet(void) {
     Entity *bullet;
     bullet = malloc(sizeof(Entity));
     memset(bullet, 0, sizeof(Entity));
     initBullet(bullet);
-    centerBulletTexture(bullet);
+    centerBulletTexture(bullet, player);
     player->bulletReload = BULLET_RELOAD;
 }
 
@@ -198,9 +200,7 @@ static void spawnEnemies(void) {
     }
 }
 
-static void fireEnemyBullet(Entity *entity) {
-    Entity *bullet = malloc(sizeof(Entity));
-    memset(bullet, 0, sizeof(Entity));
+static void initEnemyBullet(const Entity *const entity, Entity *const bullet) {
     core.bulletTail->next = bullet;
     core.bulletTail = bullet;
     bullet->x = entity->x;
@@ -208,9 +208,13 @@ static void fireEnemyBullet(Entity *entity) {
     bullet->health = 1;
     bullet->texture = enemyBulletTexture;
     bullet->side = entity->side;
-    SDL_QueryTexture(bullet->texture, NULL, NULL, &bullet->w, &bullet->h);
-    bullet->x += (entity->w / 2) - (bullet->w / 2);
-    bullet->y += (entity->h / 2) - (bullet->h / 2);
+}
+
+static void fireEnemyBullet(Entity *entity) {
+    Entity *bullet = malloc(sizeof(Entity));
+    memset(bullet, 0, sizeof(Entity));
+    initEnemyBullet(entity, bullet);
+    centerBulletTexture(bullet, entity);
     calcSlope(
             player->x + (player->w / 2), player->y + (player->h / 2),
             entity->x, entity->y,
@@ -251,4 +255,3 @@ static void draw(void) {
     drawFighters();
     drawBullets();
 }
-

@@ -39,3 +39,12 @@ void calcSlope(int x1, int y1,
     *dy = (y1 - y2);
     *dy /= steps;
 }
+
+void centerBulletTexture(Entity *const bullet,
+                         const Entity *const entity) {
+    SDL_QueryTexture(
+            bullet->texture, NULL, NULL, &bullet->w, &bullet->h
+    );
+    bullet->x += (entity->w / 2) - (bullet->w / 2);
+    bullet->y += (entity->h / 2) - (bullet->h / 2);
+}
