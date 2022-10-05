@@ -10,6 +10,9 @@ Core core;
 static void capFrameRate(long *then, float *remainder);
 
 //TODO Later on create a readme file describing all of util's functions and game's logic
+//TODO Review defs.h to make gameplay more realistic
+//TODO Make enemies also shoot straight as well as make them not shoot anymore if their x is lower than player's
+//TODO Implement thrust animation for fighters
 
 int main(void) {
     long then;
