@@ -12,6 +12,12 @@ typedef struct {
     int keyboard[MAX_KEYBOARD_KEYS];
 } App;
 
+typedef enum {
+    MULTI_DIRECTIONAL,
+    STRAIGHT,
+    NONE
+} FireType;
+
 struct Entity {
     float x;
     float y;
@@ -22,6 +28,7 @@ struct Entity {
     int health;
     int bulletReload;
     int side;
+    FireType fireType;
     SDL_Texture *texture;
     Entity *next;
 };

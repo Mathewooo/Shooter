@@ -89,10 +89,10 @@ static void clipPlayer(void) {
 }
 
 static void playerInput(void) {
-    if (app.keyboard[SDL_SCANCODE_UP]) player->dy = -PLAYER_SPEED;
-    if (app.keyboard[SDL_SCANCODE_LEFT]) player->dx = -PLAYER_SPEED;
-    if (app.keyboard[SDL_SCANCODE_DOWN]) player->dy = PLAYER_SPEED;
-    if (app.keyboard[SDL_SCANCODE_RIGHT]) player->dx = PLAYER_SPEED;
+    if (app.keyboard[SDL_SCANCODE_W]) player->dy = -PLAYER_SPEED;
+    if (app.keyboard[SDL_SCANCODE_A]) player->dx = -PLAYER_SPEED;
+    if (app.keyboard[SDL_SCANCODE_S]) player->dy = PLAYER_SPEED;
+    if (app.keyboard[SDL_SCANCODE_D]) player->dx = PLAYER_SPEED;
     if (app.keyboard[SDL_SCANCODE_SPACE] && player->bulletReload <= 0) fireBullet();
     clipPlayer();
 }
@@ -109,7 +109,7 @@ static void initBullet(Entity *const bullet) {
     core.bulletTail->next = bullet;
     core.bulletTail = bullet;
     bullet->x = player->x + 40;
-    bullet->y = randomBound(player->y - BOUND, player->y + BOUND);
+    bullet->y = randBound(player->y - BOUND, player->y + BOUND);
     bullet->dx = PLAYER_BULLET_SPEED;
     bullet->health = 1;
     bullet->texture = bulletTexture;
@@ -178,24 +178,24 @@ static void initEnemy(Entity *const enemy) {
     core.fighterTail->next = enemy;
     core.fighterTail = enemy;
     enemy->x = SCREEN_WIDTH;
-    enemy->y = randVal(SCREEN_HEIGHT);
-    enemy->dx = randomBound(-4, 3);
-    enemy->texture = enemyTexture;
+    enemy->y = randVal(SCREEN_HEIGHT - enemy->h);
+    enemy->dx = randBound(-4, 3);
     enemy->health = 1;
     enemy->side = SIDE_ALIEN;
-    enemy->bulletReload = FPS * randomBound(
+    enemy->bulletReload = FPS * randBound(
             2, 3
-            );
+    );
 }
 
 static void spawnEnemies(void) {
     if (--enemySpawnTimer <= 0) {
         Entity *enemy = malloc(sizeof(Entity));
         memset(enemy, 0, sizeof(Entity));
-        initEnemy(enemy);
+        enemy->texture = enemyTexture;
         SDL_QueryTexture(
                 enemy->texture, NULL, NULL, &enemy->w, &enemy->h
         );
+        initEnemy(enemy);
         enemySpawnTimer = 35 + randVal(70);
     }
 }
@@ -211,26 +211,32 @@ static void initEnemyBullet(const Entity *const entity, Entity *const bullet) {
 }
 
 static void fireEnemyBullet(Entity *entity) {
+    if (entity->fireType == NONE) return;
     Entity *bullet = malloc(sizeof(Entity));
     memset(bullet, 0, sizeof(Entity));
     initEnemyBullet(entity, bullet);
     centerBulletTexture(bullet, entity);
-    calcSlope(
-            player->x + (player->w / 2), player->y + (player->h / 2),
-            entity->x, entity->y,
-            &bullet->dx, &bullet->dy
-    );
-    bullet->dx *= ALIEN_BULLET_SPEED;
-    bullet->dy *= ALIEN_BULLET_SPEED;
-    entity->bulletReload = randomBound(
+    if (entity->fireType == MULTI_DIRECTIONAL) {
+        calcSlope(
+                player->x + (player->w / 2), player->y + (player->h / 2),
+                entity->x, entity->y,
+                &bullet->dx, &bullet->dy
+        );
+        bullet->dx *= ALIEN_BULLET_SPEED;
+        bullet->dy *= ALIEN_BULLET_SPEED;
+    }
+    bullet->dx = -ALIEN_BULLET_SPEED;
+    entity->bulletReload = randBound(
             FPS * 2, FPS * 2.5
-            );
+    );
 }
 
 static void attackingEnemies(void) {
-    for (Entity *entity = core.fighterHead.next ; entity != NULL ; entity = entity->next)
-        if (entity != player && player != NULL && --entity->bulletReload <= 0)
+    for (Entity *entity = core.fighterHead.next; entity != NULL; entity = entity->next)
+        if (entity != player && player != NULL && --entity->bulletReload <= 0) {
+            setBulletFireType(entity, player);
             fireEnemyBullet(entity);
+        }
 }
 
 static void logic(void) {

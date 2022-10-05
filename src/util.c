@@ -8,7 +8,7 @@ void initRandomness(void) {
     srand(time(NULL));
 }
 
-long randomBound(long min, long max) {
+long randBound(long min, long max) {
     return min + (rand() % (max - min));
 }
 
@@ -46,4 +46,16 @@ void centerBulletTexture(Entity *const bullet,
     );
     bullet->x += (entity->w / 2) - (bullet->w / 2);
     bullet->y += (entity->h / 2) - (bullet->h / 2);
+}
+
+void setBulletFireType(Entity *const enemy,
+                       const Entity *const player) {
+    if (enemy->x < player->x) enemy->fireType = NONE;
+    else {
+        if ((enemy->y >= player->y - player->h
+             && enemy->y <= player->y + player->h)
+            && enemy->x > player->x)
+            enemy->fireType = STRAIGHT;
+        else if (enemy->x > player->x) enemy->fireType = MULTI_DIRECTIONAL;
+    }
 }
