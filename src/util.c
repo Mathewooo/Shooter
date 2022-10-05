@@ -4,8 +4,6 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-extern
-
 void initRandomness(void) {
     srand(time(NULL));
 }
@@ -18,9 +16,10 @@ long randVal(long val) {
     return rand() % val;
 }
 
-int didCollide(const Entity *const e1, const Entity *const e2) {
-    return (MAX(e1->x, e2->x) < MIN(e1->x + e1->w, e2->x + e2->w)) &&
-           (MAX(e1->y, e2->y) < MIN(e1->y + e1->h, e2->y + e2->h));
+int didCollide(const Entity *const e,
+               const Entity *const e2) {
+    return (MAX(e->x, e2->x) < MIN(e->x + e->w, e2->x + e2->w)) &&
+    (MAX(e->y, e2->y) < MIN(e->y + e->h, e2->y + e2->h));
 }
 
 void calcSlope(int x1, int y1,
