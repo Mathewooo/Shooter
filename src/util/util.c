@@ -1,4 +1,4 @@
-#include "common/common.h"
+#include "../common/common.h"
 #include "util.h"
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -33,10 +33,8 @@ void calcSlope(int x1, int y1,
         return;
     }
 
-    *dx = (x1 - x2);
-    *dx /= steps;
-    *dy = (y1 - y2);
-    *dy /= steps;
+    *dx = (x1 - x2), *dx /= steps;
+    *dy = (y1 - y2), *dy /= steps;
 }
 
 void centerBulletTexture(Entity *const bullet,

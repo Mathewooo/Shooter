@@ -9,5 +9,5 @@
 #include "SDL2/SDL_image.h"
 #include "defs.h"
 #include "structs.h"
-#include "../util.h"
-#include "../draw.h"
+#include "../util/util.h"
+#include "../textures/draw.h"

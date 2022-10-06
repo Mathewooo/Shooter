@@ -1,4 +1,4 @@
-#include "common/common.h"
+#include "../common/common.h"
 #include "init.h"
 
 #define TITLE "Shooter"
@@ -7,8 +7,7 @@ extern App app;
 
 void initSDL(void) {
     int rendererFlags, windowFlags;
-    rendererFlags = SDL_RENDERER_ACCELERATED;
-    windowFlags = 0;
+    rendererFlags = SDL_RENDERER_ACCELERATED, windowFlags = 0;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Couldn't initialize SDL: %s\n", SDL_GetError());

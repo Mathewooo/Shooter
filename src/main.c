@@ -1,8 +1,8 @@
 #include "common/common.h"
-#include "draw.h"
-#include "init.h"
-#include "input.h"
-#include "core.h"
+#include "textures/draw.h"
+#include "init/init.h"
+#include "input/input.h"
+#include "core/core.h"
 
 App app;
 Core core;
