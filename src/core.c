@@ -224,8 +224,8 @@ static void fireEnemyBullet(Entity *entity) {
         );
         bullet->dx *= ALIEN_BULLET_SPEED;
         bullet->dy *= ALIEN_BULLET_SPEED;
-    }
-    bullet->dx = -ALIEN_BULLET_SPEED;
+    } else if (entity->fireType == STRAIGHT)
+        bullet->dx = -ALIEN_BULLET_SPEED;
     entity->bulletReload = randBound(
             FPS * 2, FPS * 2.5
     );
