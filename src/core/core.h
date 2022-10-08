@@ -1,2 +1,4 @@
 void initCore(void);
-static void fireBullet(void);
+SDL_Texture *playerTexture, *bulletTexture,
+        *enemyTexture, *enemyBulletTexture,
+        *background, *explosionTexture;

@@ -8,12 +8,16 @@ void initRandomness(void) {
     srand(time(NULL));
 }
 
-long randBound(long min, long max) {
+long randBd(long min, long max) {
     return min + (rand() % (max - min));
 }
 
-long randVal(long val) {
+long randVl(long val) {
     return rand() % val;
+}
+
+long randS(long val) {
+    return rand() % val - rand() % val;
 }
 
 int didCollide(const Entity *const e,

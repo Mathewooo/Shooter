@@ -1,0 +1,10 @@
+void initEffects(void);
+void moveExplosions(void);
+void moveDebris(void);
+void moveStarfield(void);
+void addExplosions(int x, int y, int num);
+void addDebris(Entity *fighter);
+void drawBackground(void);
+void drawStarfield(void);
+void drawDebris(void);
+void drawExplosions(void);

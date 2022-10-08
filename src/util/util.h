@@ -1,6 +1,7 @@
 void initRandomness(void);
-long randBound(long min, long max);
-long randVal(long val);
+long randBd(long min, long max);
+long randVl(long val);
+long randS(long val);
 int didCollide(const Entity *const e,
                const Entity *const e2);
 void calcSlope(int x1, int y1,
