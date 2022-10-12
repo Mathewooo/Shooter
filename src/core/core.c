@@ -109,7 +109,7 @@ static void spawnEnemies(void) {
                 enemy->texture, NULL, NULL, &enemy->w, &enemy->h
         );
         initEnemy(enemy);
-        enemySpawnTimer = randBd(20, 70);
+        enemySpawnTimer = randBd(25, 75);
     }
 }
 

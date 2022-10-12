@@ -11,7 +11,7 @@ static SDL_Rect bgDest;
 /* INIT */
 
 void initStarfield(void) {
-    for (int i = 0 ; i < MAX_STARS ; i++)
+    for (int i = 0; i < MAX_STARS; i++)
         stars[i].x = randVl(SCREEN_WIDTH),
         stars[i].y = randVl(SCREEN_HEIGHT),
         stars[i].speed = randBd(2, 5);
@@ -63,7 +63,7 @@ void moveDebris(void) {
 /* STARFIELD MOVEMENT */
 
 void moveStarfield(void) {
-    for (int i = 0 ; i < MAX_STARS ; i++) {
+    for (int i = 0; i < MAX_STARS; i++) {
         stars[i].x -= stars[i].speed;
         if (stars[i].x < 0)
             stars[i].x = SCREEN_WIDTH + stars[i].x;
@@ -74,7 +74,7 @@ void moveStarfield(void) {
 
 void addExplosions(int x, int y, int num) {
     Explosion *explosion;
-    for (int i = 0 ; i < num ; i++) {
+    for (int i = 0; i < num; i++) {
         explosion = malloc(sizeof(Explosion));
         memset(explosion, 0, sizeof(Explosion));
         core.explosionTail->next = explosion, core.explosionTail = explosion;
@@ -109,8 +109,9 @@ void addDebris(Entity *fighter) {
     Debris *debris;
     int x, y, w, h;
     w = fighter->w / 2, h = fighter->h / 2;
-    for (y = 0 ; y <= h ; y += h)
-        for (x = 0 ; x <= w ; x += w) {
+    for (y = 0; y <= h; y += h)
+        for (x = 0; x <= w; x += w)
+        {
             debris = malloc(sizeof(Debris));
             memset(debris, 0, sizeof(Debris));
             core.debrisTail->next = debris, core.debrisTail = debris;
@@ -134,7 +135,7 @@ void drawBackground(void) {
 
 void drawStarfield(void) {
     int i, c;
-    for (i = 0 ; i < MAX_STARS ; i++) {
+    for (i = 0; i < MAX_STARS; i++) {
         c = 32 * stars[i].speed;
         SDL_SetRenderDrawColor(
                 app.renderer, c, c, c, 255

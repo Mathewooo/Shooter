@@ -46,7 +46,8 @@ void moveBullets(void) {
             || bullet->x <= -bullet->w
             || bullet->y <= -bullet->h
             || bullet->y >= SCREEN_HEIGHT
-            || bullet->x >= SCREEN_WIDTH) {
+            || bullet->x >= SCREEN_WIDTH)
+        {
             if (bullet == core.bulletTail)
                 core.bulletTail = prev;
             prev->next = bullet->next;

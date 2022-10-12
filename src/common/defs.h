@@ -1,5 +1,5 @@
 #define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 780
+#define SCREEN_HEIGHT 720
 #define MAX_KEYBOARD_KEYS 350
 #define FPS 60
 #define SIDE_PLAYER 0
